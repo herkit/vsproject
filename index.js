@@ -1,6 +1,7 @@
 var libxmljs = require('libxmljs');
 var fs = require('fs');
 var path = require('path');
+var vsproject = require('./vsproject');
 
 var argv = require('minimist')(process.argv.slice(2));
 console.dir(argv);
@@ -29,17 +30,8 @@ fs.readFile(argv._[0], {encoding: "utf8"}, function (err, data) {
 
   var compiles = xml.find("//p:Compile", xmlns);
 
-  var references = xml.find("//p:Reference/p:HintPath", xmlns);
 
-  var translateReferences = function (sourcedir, destdir) {
-    references.forEach(function(ref) {
-      var refpath = path.join(sourcedir, ref.text());
-      var newrefpath = path.relative(destdir, refpath);
-      ref.text(newrefpath);
-    });
-  };
-
-  translateReferences(sourcedir, destdir);
+  vsproject.translateReferences(xml, xmlns, sourcedir, destdir);
 
 
   compiles.forEach(function(c) {
