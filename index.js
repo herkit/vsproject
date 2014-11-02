@@ -25,11 +25,20 @@ console.log(path.relative(destfile, argv._[0]));
 fs.readFile(argv._[0], {encoding: "utf8"}, function (err, data) {
   if (err) throw err;
   var xml = libxmljs.parseXml(data);
+  var xmlns = { p: "http://schemas.microsoft.com/developer/msbuild/2003" };
 
-  var compiles = xml.find("//p:Compile", { p: "http://schemas.microsoft.com/developer/msbuild/2003" });
+  var compiles = xml.find("//p:Compile", xmlns);
 
-  console.log(argv.e);
-  console.log(typeof(argv.e));
+  var references = xml.find("//p:Reference/p:HintPath", xmlns);
+
+  references.forEach(function(ref) {
+    console.log("From " + ref.text());
+    var refpath = path.join(sourcedir, ref.text());
+    var newrefpath = path.relative(destdir, refpath);
+    console.log("To " + newrefpath);
+    ref.text(newrefpath);
+  });
+
 
   compiles.forEach(function(c) {
   	var projectpath = c.attr("Include").value();
@@ -65,6 +74,6 @@ fs.readFile(argv._[0], {encoding: "utf8"}, function (err, data) {
   		console.log("File saved to " + destfile);
   	});
   } else {
-		//console.log(xml.toString());
+		console.log(xml.toString());
 	}
 });
