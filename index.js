@@ -2,6 +2,7 @@ var libxmljs = require('libxmljs');
 var fs = require('fs');
 var path = require('path');
 var vsproject = require('./vsproject');
+var Project = vsproject.Project;
 
 var argv = require('minimist')(process.argv.slice(2));
 console.dir(argv);
@@ -23,51 +24,50 @@ var preview = argv.preview || false;
 
 console.log(path.relative(destfile, argv._[0]));
 
-fs.readFile(argv._[0], {encoding: "utf8"}, function (err, data) {
-  if (err) throw err;
-  var xml = libxmljs.parseXml(data);
-  var xmlns = { p: "http://schemas.microsoft.com/developer/msbuild/2003" };
+var project = new Project(sourcefile);
 
-  var compiles = xml.find("//p:Compile", xmlns);
+var xml = project.dom;
+var xmlns = { p: "http://schemas.microsoft.com/developer/msbuild/2003" };
 
-
-  vsproject.translateReferences(xml, xmlns, sourcedir, destdir);
+var compiles = xml.find("//p:Compile", xmlns);
 
 
-  compiles.forEach(function(c) {
-  	var projectpath = c.attr("Include").value();
+vsproject.translateReferences(xml, xmlns, sourcedir, destdir);
 
-  	if (typeof(filterpattern) === "string") {
-      console.log("Checking file " + projectpath + " against " + argv.e);
-  		if (!projectpath.match(filterpattern))
-      {
-        console.log("Removing " + c.toString());
-        c.remove();
-        return;
-      }
+
+compiles.forEach(function(c) {
+	var projectpath = c.attr("Include").value();
+
+	if (typeof(filterpattern) === "string") {
+    console.log("Checking file " + projectpath + " against " + argv.e);
+		if (!projectpath.match(filterpattern))
+    {
+      console.log("Removing " + c.toString());
+      c.remove();
+      return;
     }
+  }
 
-    if (typeof(excludepattern) === "string") {
-      if (projectpath.match(excludepattern))
-      {
-        console.log("Removing " + c.toString());
-        c.remove();
-        return;
-      }
+  if (typeof(excludepattern) === "string") {
+    if (projectpath.match(excludepattern))
+    {
+      console.log("Removing " + c.toString());
+      c.remove();
+      return;
     }
+  }
 
-  	var sourcepath = path.join(sourcedir, projectpath);
-  	var relativepath = path.relative(destdir, sourcepath);
-  	c.attr("Include", relativepath);
-  	var linknode = c.node("Link", projectpath);
-  });
-
-  if (!preview) {
-    fs.writeFile(destfile, xml.toString(), function(err) {
-  		if (err) throw err;
-  		console.log("File saved to " + destfile);
-  	});
-  } else {
-		console.log(xml.toString());
-	}
+	var sourcepath = path.join(sourcedir, projectpath);
+	var relativepath = path.relative(destdir, sourcepath);
+	c.attr("Include", relativepath);
+	var linknode = c.node("Link", projectpath);
 });
+
+if (!preview) {
+  fs.writeFile(destfile, xml.toString(), function(err) {
+		if (err) throw err;
+		console.log("File saved to " + destfile);
+	});
+} else {
+	console.log(xml.toString());
+}

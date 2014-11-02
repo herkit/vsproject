@@ -1,4 +1,6 @@
 var path = require('path');
+var fs = require('fs');
+var libxmljs = require('libxmljs');
 
 module.exports = {
   translateReferences: function (xml, xmlns, sourcedir, destdir) {
@@ -8,5 +10,12 @@ module.exports = {
       var newrefpath = path.relative(destdir, refpath);
       ref.text(newrefpath);
     });
+  },
+  Project: function(filename) {
+    var data = fs.readFileSync(filename, {encoding: "utf8"});
+    this.file = filename;
+    this.dir = path.dirname(filename);
+    this.dom = libxmljs.parseXml(data);
+    this.xmlns = { p: "http://schemas.microsoft.com/developer/msbuild/2003" };
   }
 };
