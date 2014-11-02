@@ -31,13 +31,15 @@ fs.readFile(argv._[0], {encoding: "utf8"}, function (err, data) {
 
   var references = xml.find("//p:Reference/p:HintPath", xmlns);
 
-  references.forEach(function(ref) {
-    console.log("From " + ref.text());
-    var refpath = path.join(sourcedir, ref.text());
-    var newrefpath = path.relative(destdir, refpath);
-    console.log("To " + newrefpath);
-    ref.text(newrefpath);
-  });
+  var translateReferences = function (sourcedir, destdir) {
+    references.forEach(function(ref) {
+      var refpath = path.join(sourcedir, ref.text());
+      var newrefpath = path.relative(destdir, refpath);
+      ref.text(newrefpath);
+    });
+  };
+
+  translateReferences(sourcedir, destdir);
 
 
   compiles.forEach(function(c) {
