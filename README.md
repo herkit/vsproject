@@ -11,10 +11,14 @@ Examples of use:
 
 ## Usage
 
-  node index.js c:\code\src\project1\source.csproj c:\code\src\project2\source.csproj (-f "filterregex") (-e "excluderegex") (--preview)
+````
+node index.js c:\code\src\project1\source.csproj c:\code\src\project2\source.csproj (-f "filterregex") (-e "excluderegex") (--preview)
+````
   
 ### Options
   
-  -f          Only add files mathing regex to the destination project
-  -e          Excludes files matching regex from the destination project
-  --preview   Does not save file, but outputs results to console
+````
+-f          Only add files mathing regex to the destination project
+-e          Excludes files matching regex from the destination project
+--preview   Does not save file, but outputs results to console
+````
