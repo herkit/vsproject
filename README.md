@@ -12,7 +12,7 @@ Examples of use:
 ## Usage
 
 ````
-node index.js c:\code\src\project1\source.csproj c:\code\src\project2\source.csproj (-f "filterregex") (-e "excluderegex") (--preview)
+node index.js c:\code\src\project1\source.csproj c:\code\src\project2\dest.csproj (-f "filterregex") (-e "excluderegex") (--preview)
 ````
   
 ### Options
